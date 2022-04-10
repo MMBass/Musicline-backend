@@ -23,15 +23,14 @@ app.get('/', (req, res) => {
 app.post('/lyrics', (req, res, next) => {
     let cors = `https://cors-anywhere.herokuapp.com/`;
     let musixMatch = `http://api.musixmatch.com/ws/1.1/`;
-console.log(req.body);
 
     const currSong = req.body.currSong;
     const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
-
+    console.log(currSong);
     axios
-        .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${encodeURI(currSong.songName)}&q_artist=${encodeURI(currSong.artistName)}`)
+        .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${(currSong.songName)}&q_artist=${(currSong.artistName)}`)
         .then(response => {
-            console.log(response.data);
+            console.log(response.data.message);
             if(response?.data){
                 res.send(response.data);
             }
