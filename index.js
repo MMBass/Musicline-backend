@@ -7,7 +7,7 @@ const axios = require('axios');
 const Reverso = require('reverso-api');
 const reverso = new Reverso();
 
-const dev_config = (process.env.store === undefined) ? require('../devConfig') : undefined;
+const dev_config = (process.env.store === undefined) ? require('./devConfig') : undefined;
 
 app.use(cors());
 app.use(express.json());
