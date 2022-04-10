@@ -12,6 +12,12 @@ const dev_config = (process.env.store === undefined) ? require('./devConfig') : 
 app.use(cors());
 app.use(express.json());
 
+// app.use((req,res)=>{
+//     res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+//     res.setHeader('Access-Control-Allow-Credentials', true)
+//     res.setHeader('Access-Control-Allow-Origin', '*')
+// })
+
 function init() {
 
 }
