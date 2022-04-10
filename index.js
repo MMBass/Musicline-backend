@@ -25,10 +25,10 @@ app.post('/lyrics', (req, res, next) => {
     let musixMatch = `http://api.musixmatch.com/ws/1.1/`;
 
     const currSong = req.body.currSong;
-    const musixmach_key = process.env.musixmachKey || dev_config.musixmachKey;
+    const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
 
     axios
-        .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmach_key}&q_track=${encodeURI(currSong.songtName)}&q_artist=${encodeURI(currSong.artistName)}`)
+        .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${encodeURI(currSong.songtName)}&q_artist=${encodeURI(currSong.artistName)}`)
         .then(response => {
             console.log(response.data);
             if(response?.data){
