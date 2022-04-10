@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
 app.post('/lyrics', (req, res, next) => {
     let cors = `https://cors-anywhere.herokuapp.com/`;
     let musixMatch = `http://api.musixmatch.com/ws/1.1/`;
+console.log(req.body);
 
     const currSong = req.body.currSong;
     const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
@@ -45,7 +46,6 @@ app.post('/lyrics', (req, res, next) => {
 });
 
 app.post('/line-trans', (req, res, next) => {
-    console.log(decodeURI(req.body.line));
     if (req.body?.line) {
         reverso.getTranslation(decodeURI(req.body.line), 'English', 'Hebrew', (response) => {
             console.log(response.translation[0]);
