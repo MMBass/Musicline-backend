@@ -36,7 +36,8 @@ app.post('/lyrics', (req, res, next) => {
             }
         })
         .catch(error => {
-            console.error(error)
+            console.error(error);
+            
             res.status(404).send();
         
         })
