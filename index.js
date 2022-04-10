@@ -28,7 +28,7 @@ app.post('/lyrics', (req, res, next) => {
     const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
 
     axios
-        .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${encodeURI(currSong.songtName)}&q_artist=${encodeURI(currSong.artistName)}`)
+        .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${encodeURI(currSong.songName)}&q_artist=${encodeURI(currSong.artistName)}`)
         .then(response => {
             console.log(response.data);
             if(response?.data){
@@ -37,7 +37,7 @@ app.post('/lyrics', (req, res, next) => {
         })
         .catch(error => {
             console.error(error);
-            
+
             res.status(404).send();
         
         })
