@@ -134,9 +134,11 @@ app.post('/single-trans', (req, res, next) => {
             }],
             responseType: 'json'
         }).then(function (response) {
+            let results = [];
             response.data[0].translations.forEach(element => {
-                console.log(element.normalizedTarget);
+                results.push(element.normalizedTarget);
             });
+            res.send({ results: results });
         })
     }
 });
