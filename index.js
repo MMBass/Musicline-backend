@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors')
 
 const axios = require('axios');
+const { v4: uuidv4 } = require('uuid');
 
 const Reverso = require('reverso-api');
 const reverso = new Reverso();
@@ -15,6 +16,7 @@ app.use(express.json());
 function init() {
 
 }
+init();
 
 app.get('/', (req, res) => {
     res.status(200).send();
@@ -26,12 +28,11 @@ app.post('/lyrics', (req, res, next) => {
 
     const currSong = req.body.currSong;
     const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
-    console.log(currSong);
+
     axios
         .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${(currSong.songName)}&q_artist=${(currSong.artistName)}`)
         .then(response => {
-            console.log(response.data.message);
-            if(response?.data){
+            if (response?.data) {
                 res.send(response.data);
             }
         })
@@ -39,27 +40,105 @@ app.post('/lyrics', (req, res, next) => {
             console.error(error);
 
             res.status(404).send();
-        
+
         })
 
 });
 
 app.post('/line-trans', (req, res, next) => {
     if (req.body?.line) {
-        reverso.getTranslation(decodeURI(req.body.line), 'English', 'Hebrew', (response) => {
-            console.log(response.translation[0]);
-            if (response.translation[0]) {
-                res.send({ trans: response.translation[0] });
-            } else {
-                res.send('translation faild for: ' + req.body.line)
-            }
 
-        }).catch((err) => {
-            res.send('translation faild for: ' + req.body.line)
-            console.error(err);
-        });
+        try {
+            let azureApi = `https://api.cognitive.microsofttranslator.com`;
+
+            const line = req.body.line;
+            const azure_translate_api = process.env.azureTranslateApi || dev_config.azureTranslateApi;
+
+            axios({
+                baseURL: azureApi,
+                url: '/translate',
+                method: 'post',
+                headers: {
+                    'Ocp-Apim-Subscription-Key': azure_translate_api,
+                    'Ocp-Apim-Subscription-Region': 'global',
+                    'Content-type': 'application/json',
+                    'X-ClientTraceId': uuidv4().toString()
+                },
+                params: {
+                    'api-version': '3.0',
+                    'from': 'en',
+                    'to': ['he']
+                },
+                data: [{
+                    'text': decodeURI(line)
+                }],
+                responseType: 'json'
+            }).then(function (response) {
+                if (response.data[0].translations[0]) {
+                    res.send({ trans: response.data[0].translations[0].text });
+                } else {
+                    res.send('translation faild for: ' + req.body.line)
+                }
+            }).catch((err) => {
+                res.send('translation faild for: ' + req.body.line)
+                console.error(err);
+            });
+        } catch {
+            try{
+                reverso.getTranslation(decodeURI(req.body.line), 'English', 'Hebrew', (response) => {
+                    if (response.translation[0]) {
+                        res.send({ trans: response.translation[0] });
+                    } else {
+                        res.send('translation faild for: ' + req.body.line)
+                    }
+    
+                }).catch((err) => {
+                    res.send('translation faild for: ' + req.body.line)
+                    console.error(err);
+                });
+            }catch{
+                res.status(404).send();
+            }
+          
+        }
     }
 
+});
+
+app.post('/single-trans', (req, res, next) => {
+    if (req.body?.single) {
+
+        // api docs : https://docs.microsoft.com/en-us/azure/cognitive-services/Translator/quickstart-translator?tabs=nodejs#transliterate-text
+        let azureApi = `https://api.cognitive.microsofttranslator.com`;
+
+        const single = req.body.single;
+        const azure_translate_api = process.env.azureTranslateApi || dev_config.azureTranslateApi;
+
+        axios({
+            baseURL: azureApi,
+            url: '/dictionary/lookup',
+            method: 'post',
+            headers: {
+                'Ocp-Apim-Subscription-Key': azure_translate_api,
+                'Ocp-Apim-Subscription-Region': 'global',
+                'Content-type': 'application/json',
+                'X-ClientTraceId': uuidv4().toString()
+            },
+            params: {
+                'api-version': '3.0',
+                'from': 'en',
+                'to': ['he']
+            },
+            data: [{
+                'text': single
+            }],
+            responseType: 'json'
+        }).then(function (response) {
+            response.data[0].translations.forEach(element => {
+                console.log(element.normalizedTarget);
+            });
+        })
+    }
 });
 
 const PORT = process.env.PORT || 5000;
