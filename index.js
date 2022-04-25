@@ -8,8 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 const Reverso = require('reverso-api');
 const reverso = new Reverso();
 
-let genius =  require ('genius-lyrics-api');
-const urlencoded = require('body-parser/lib/types/urlencoded');
+let genius = require('genius-lyrics-api');
 
 const dev_config = (process.env.vercel === undefined) ? require('./devConfig') : undefined;
 
@@ -27,37 +26,47 @@ app.get('/', (req, res) => {
 
 app.post('/lyrics', (req, res, next) => {
     const currSong = req.body.currSong;
+    const genious_key = process.env.geniousApi || dev_config.geniousApi;
 
-    try{
+    try {
         const options = {
-            apiKey: 'vaqpKvuPqPuhDIaf9uNkKjycJ4OKyzwJXu1Ph2uLkogU8l_FKXuKeFpX3UcGu90F',
+            apiKey: genious_key,
             title: decodeURI(currSong.songName),
             artist: decodeURI(currSong.artistName),
             optimizeQuery: true
         };
-    
-        genius.getLyrics(options).then((lyrics) =>{
-            res.send({lyrics});
+
+        genius.getLyrics(options).then((lyrics) => {
+            res.send({ lyrics });
         })
-    }catch{
+    } catch {
         let musixMatch = `http://api.musixmatch.com/ws/1.1/`;
 
         const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
-    
+
         axios
             .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${(currSong.songName)}&q_artist=${(currSong.artistName)}`)
             .then(response => {
                 if (response?.data) {
-                    res.send({lyrics: response.data.message.body.lyrics.lyrics_body});
+                    res.send({ lyrics: response.data.message.body.lyrics.lyrics_body });
                 }
             })
             .catch(error => {
                 console.error(error);
-    
+
                 res.status(404).send();
-    
+
             })
     }
+
+    // next method to try if genious blockd:
+    // const alltomp3 = require('alltomp3'); // todo install
+
+    // alltomp3.findLyrics('Radioactive', 'Imagine Dragons').then((lyrics) => {
+    //     console.log(lyrics);
+    // }).catch(() => {
+    //     console.log('No lyrics');
+    // });
 
 });
 
