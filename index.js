@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
 app.post('/lyrics', (req, res, next) => {
     const currSong = req.body.currSong;
     const genious_key = process.env.geniousApi || dev_config.geniousApi;
+    // https://genius.com/api-clients // manage apps
 
     try {
         const options = {
@@ -43,6 +44,7 @@ app.post('/lyrics', (req, res, next) => {
         let musixMatch = `http://api.musixmatch.com/ws/1.1/`;
 
         const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
+        // https://developer.musixmatch.com/admin // no option to change - todo important if start paying replace the token
 
         axios
             .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${(currSong.songName)}&q_artist=${(currSong.artistName)}`)
@@ -58,15 +60,6 @@ app.post('/lyrics', (req, res, next) => {
 
             })
     }
-
-    // next method to try if genious blockd:
-    // const alltomp3 = require('alltomp3'); // todo install
-
-    // alltomp3.findLyrics('Radioactive', 'Imagine Dragons').then((lyrics) => {
-    //     console.log(lyrics);
-    // }).catch(() => {
-    //     console.log('No lyrics');
-    // });
 
 });
 
@@ -84,6 +77,7 @@ app.post('/line-trans', (req, res, next) => {
             let azureApi = `https://api.cognitive.microsofttranslator.com`;
 
             const azure_translate_api = process.env.azureTranslateApi || dev_config.azureTranslateApi;
+            // https://portal.azure.com/#home // manage apps
 
             axios({
                 baseURL: azureApi,
