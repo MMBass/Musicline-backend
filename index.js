@@ -78,7 +78,7 @@ app.post('/line-trans', (req, res, next) => {
 
             const azure_translate_api = process.env.azureTranslateApi || dev_config.azureTranslateApi;
             // https://portal.azure.com/#home // manage apps
-console.log(azure_translate_api)
+
             axios({
                 baseURL: azureApi,
                 url: '/translate',
@@ -97,7 +97,6 @@ console.log(azure_translate_api)
                 data: lines,
                 responseType: 'json'
             }).then(function (response) {
-     console.log(response)
                 let results = [];
                 if (response.data[0].translations[0]) {
                     response.data.map((y) => {
