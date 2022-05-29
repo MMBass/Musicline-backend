@@ -38,9 +38,14 @@ app.post('/lyrics', (req, res, next) => {
         };
 
         genius.getLyrics(options).then((lyrics) => {
-            res.send({ lyrics });
+            if(lyrics?.length < 4500 ){
+                res.send({ lyrics });
+            }else{
+                res.status(500).send({message:'too long'});
+            }
         })
     } catch {
+        console.log('catch');
         let musixMatch = `http://api.musixmatch.com/ws/1.1/`;
 
         const musixmatch_key = process.env.musixmatchKey || dev_config.musixmatchKey;
@@ -49,6 +54,7 @@ app.post('/lyrics', (req, res, next) => {
         axios
             .get(`${musixMatch}matcher.lyrics.get?apikey=${musixmatch_key}&q_track=${(currSong.songName)}&q_artist=${(currSong.artistName)}`)
             .then(response => {
+                console.log(response);
                 if (response?.data) {
                     res.send({ lyrics: response.data.message.body.lyrics.lyrics_body });
                 }
