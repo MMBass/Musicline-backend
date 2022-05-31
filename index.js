@@ -38,10 +38,15 @@ app.post('/lyrics', (req, res, next) => {
         };
 
         genius.getLyrics(options).then((lyrics) => {
+            console.log(lyrics);
             if(lyrics?.length < 4500 ){
                 res.send({ lyrics });
             }else{
-                res.status(500).send({message:'too long'});
+                if(!lyrics){
+                    res.status(404).send({message:'song not found'});
+                }else{
+                    res.status(500).send({message:'too long'});
+                }
             }
         })
     } catch {
