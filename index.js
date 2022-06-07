@@ -115,10 +115,10 @@ app.post('/line-trans', (req, res, next) => {
                     });
                     res.send({ trans: results });
                 } else {
-                    res.send('translation faild for: ' + req.body.lines)
+                    res.send('translation faild for lines')
                 }
             }).catch((err) => {
-                res.send('translation faild for: ' + req.body.lines)
+                res.send('translation faild for lines')
                 console.error(err);
             });
         } catch {
@@ -143,15 +143,15 @@ app.post('/line-trans', (req, res, next) => {
 
 app.post('/single-line-trans', (req, res, next) => {
     try {
-        reverso.getTranslation(decodeURI(req.body.lines), 'English', 'Hebrew', (response) => {
+        reverso.getTranslation(decodeURI(req.body.line), 'English', 'Hebrew', (response) => {
             if (response.translation[0]) {
                 res.send({ trans: response.translation[0] });
             } else {
-                res.send('translation faild for: ' + req.body.lines)
+                res.send('translation faild for: ' + req.body.line)
             }
 
         }).catch((err) => {
-            res.send('translation faild for: ' + req.body.lines)
+            res.send('translation faild for: ' + req.body.line)
             console.error(err);
         });
     } catch {
