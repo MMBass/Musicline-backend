@@ -135,12 +135,28 @@ app.post('/line-trans', (req, res, next) => {
                     console.error(err);
                 });
             } catch {
-                res.status(404).send();
+                res.status(500).send('r api error');
             }
-
         }
     }
+});
 
+app.post('/single-line-trans', (req, res, next) => {
+    try {
+        reverso.getTranslation(decodeURI(req.body.lines), 'English', 'Hebrew', (response) => {
+            if (response.translation[0]) {
+                res.send({ trans: response.translation[0] });
+            } else {
+                res.send('translation faild for: ' + req.body.lines)
+            }
+
+        }).catch((err) => {
+            res.send('translation faild for: ' + req.body.lines)
+            console.error(err);
+        });
+    } catch {
+        res.status(500).send('r api error');
+    }
 });
 
 app.post('/single-trans', (req, res, next) => {
