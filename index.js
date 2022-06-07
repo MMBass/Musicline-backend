@@ -27,8 +27,8 @@ app.get('/', (req, res) => {
 app.post('/lyrics', (req, res, next) => {
     const currSong = req.body.currSong;
 
-    let en_pattern = /^[~`!@#$%^&*()_+=[\]\{}|;':",.\/<>?a-zA-Z0-9-]+$/;
-    if(!en_pattern.test(decodeURI(currSong.songName))) res.status(400).send({message:'english only'});
+    let en_pattern = /^[~`!@#$%^&*()_+=[\]\{}|;':",.\/<>?a-zA-Z0-9- ]+$/;
+    if(!en_pattern.test(decodeURI(currSong))) res.status(400).send({message:'english only'});
     
     const genious_key = process.env.geniousApi || dev_config.geniousApi;
     // https://genius.com/api-clients // manage apps
