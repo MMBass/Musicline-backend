@@ -12,7 +12,7 @@ let genius = require('genius-lyrics-api');
 
 const dev_config = (process.env.vercel === undefined) ? require('./devConfig') : undefined;
 
-const en_pattern = /^[~`!@#$%^&*()_+=[\]\{}|;':",.\/<>?a-zA-Z0-9- ]+$/;
+const en_pattern = /^[~`!@#$%^&*()_=[\]\{}|;':",.\/<>?a-zA-Z0-9- \s\S]+$/; // accepts linebreaks, no plus sign;
 
 app.use(cors());
 app.use(express.json());
