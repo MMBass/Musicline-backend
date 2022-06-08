@@ -12,8 +12,6 @@ let genius = require('genius-lyrics-api');
 
 const dev_config = (process.env.vercel === undefined) ? require('./devConfig') : undefined;
 
-const en_pattern = /^[~`!@#$%^&*()_=[\]\{}|;':",.\/<>?a-zA-Z0-9- \s\S]+$/; // accepts linebreaks, no plus sign;
-
 app.use(cors());
 app.use(express.json());
 
@@ -29,8 +27,9 @@ app.get('/', (req, res) => {
 app.post('/lyrics', (req, res, next) => {
     const currSong = req.body.currSong;
 
-    if (!en_pattern.test(decodeURI(currSong))) res.status(400).send({ message: 'english only' });
-
+    let en_pattern = /^[~`!@#$%^&*()_+=[\]\{}|;':",.\/<>?a-zA-Z0-9- ]+$/;
+    if(!en_pattern.test(decodeURI(currSong))) res.status(400).send({message:'english only'});
+    
     const genious_key = process.env.geniousApi || dev_config.geniousApi;
     // https://genius.com/api-clients // manage apps
 
@@ -43,15 +42,14 @@ app.post('/lyrics', (req, res, next) => {
         };
 
         genius.getLyrics(options).then((lyrics) => {
-            if (lyrics?.length < 4500 && (en_pattern.test(lyrics))) {
+            console.log(lyrics);
+            if(lyrics?.length < 4500 ){
                 res.send({ lyrics });
-            } else {
-                if (!lyrics) {
-                    res.status(404).send({ message: 'song not found' });
-                } else if (lyrics?.length > 4500) {
-                    res.status(500).send({ message: 'song too long' });
-                } else if ((!en_pattern.test(lyrics))) {
-                    res.status(500).send({ message: 'song has to be fully english' });
+            }else{
+                if(!lyrics){
+                    res.status(404).send({message:'song not found'});
+                }else{
+                    res.status(500).send({message:'too long'});
                 }
             }
         })
@@ -130,7 +128,6 @@ app.post('/line-trans', (req, res, next) => {
         } catch {
             try {
                 reverso.getTranslation(decodeURI(req.body.lines), 'English', 'Hebrew', (response) => {
-                    // Max chars in once - 2,000
                     if (response.translation[0]) {
                         res.send({ trans: response.translation[0] });
                     } else {
@@ -154,30 +151,12 @@ app.post('/single-line-trans', (req, res, next) => {
             if (response.translation[0]) {
                 res.send({ trans: response.translation[0] });
             } else {
-                reverso.getTranslation(decodeURI(req.body.line), 'English', 'Hebrew', (response) => {
-                    if (response.translation[0]) {
-                        res.send({ trans: response.translation[0] });
-                    } else {
-                        res.send('translation faild for: ' + req.body.line)
-                    }
-
-                }).catch((err) => {
-                    res.send('translation faild for: ' + req.body.line)
-                    console.error(err);
-                });
+                res.send('translation faild for: ' + req.body.line)
             }
 
         }).catch((err) => {
-            reverso.getTranslation(decodeURI(req.body.line), 'English', 'Hebrew', (response) => {
-                if (response.translation[0]) {
-                    res.send({ trans: response.translation[0] });
-                } else {
-                    res.send('translation faild for: ' + req.body.line)
-                }
-            }).catch((err) => {
-                res.send('translation faild for: ' + req.body.line)
-                console.error(err);
-            });
+            res.send('translation faild for: ' + req.body.line)
+            console.error(err);
         });
     } catch {
         res.status(500).send('r api error');
@@ -222,7 +201,5 @@ app.post('/single-trans', (req, res, next) => {
     }
 });
 
-
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => { console.log('listen 5000...') });
+app.listen(PORT, () => { console.log('listen 5000...') })
